@@ -530,12 +530,22 @@ static char const * const kEmptyDataSetView =       "emptyDataSetView";
         // Configure empty dataset userInteraction permission
         view.userInteractionEnabled = [self dzn_isTouchAllowed];
         
+        if (self.emptyDataSetSource && [self.emptyDataSetSource respondsToSelector:@selector(buttonContentEdgeInsets:)]) {
+            view.button.contentEdgeInsets = [self.emptyDataSetSource buttonContentEdgeInsets: self];
+        } else {
+            view.button.contentEdgeInsets = UIEdgeInsetsMake(6, 10, 6, 10); // default
+        }
         [view setupConstraints];
         
         [UIView performWithoutAnimation:^{
             [view layoutIfNeeded];
         }];
         
+        if (self.emptyDataSetSource && [self.emptyDataSetSource respondsToSelector:@selector(buttonBackgroundGradientLayerForEmptyDataSet:forState:)]) {
+            CAGradientLayer *gradientLayer =  [self.emptyDataSetSource buttonBackgroundGradientLayerForEmptyDataSet:self forState:UIControlStateNormal];
+            gradientLayer.frame = view.button.bounds;
+            [view.button.layer insertSublayer:gradientLayer atIndex:0];
+        }
         // Configure scroll permission
         self.scrollEnabled = [self dzn_isScrollAllowed];
         
@@ -991,8 +1001,12 @@ Class dzn_baseClassToSwizzleForTarget(id target)
             [subviewStrings addObject:@"button"];
             views[[subviewStrings lastObject]] = _button;
             
+             /*
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(padding@750)-[button(>=0)]-(padding@750)-|"
-                                                                                     options:0 metrics:metrics views:views]];
+                                                                                     options:0 metrics:metrics views:views]];*/
+            // UIButton -> Horizontal center
+            _button.translatesAutoresizingMaskIntoConstraints = false;
+            [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:_button attribute: NSLayoutAttributeCenterX relatedBy: NSLayoutRelationEqual toItem: self.contentView attribute:NSLayoutAttributeCenterX multiplier: 1 constant: 0.0]];
         }
         // or removes from its superview
         else {

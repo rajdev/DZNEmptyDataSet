@@ -120,6 +120,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable UIImage *)buttonBackgroundImageForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state;
 
+
+- (CAGradientLayer *)buttonBackgroundGradientLayerForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state;
+
+- (UIEdgeInsets)buttonContentEdgeInsets:(UIScrollView *)scrollView;
+
 /**
  Asks the data source for the background color of the dataset. Default is clear color.
  
